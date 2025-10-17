@@ -1,0 +1,228 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global styles for the crypto dashboard */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    box-sizing: border-box;
+  }
+  
+  body {
+    @apply bg-dark-900 text-text-primary;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.5;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Enhanced scrollbar styles */
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.4) rgba(255, 255, 255, 0.1);
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-corner {
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* Enhanced glassmorphism utilities */
+@layer components {
+  .glass-effect {
+    @apply backdrop-blur-glass bg-glass-white border border-glass-border shadow-glass;
+  }
+  
+  .glass-card {
+    @apply glass-effect rounded-xl shadow-glass-inset;
+  }
+  
+  .glass-elevated {
+    @apply glass-effect rounded-xl shadow-elevated backdrop-blur-strong;
+  }
+  
+  .glow-effect {
+    @apply shadow-neon-blue;
+  }
+  
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary-400 to-purple-400 bg-clip-text text-transparent;
+  }
+  
+  .text-crypto-gradient {
+    @apply bg-gradient-to-r from-crypto-bitcoin to-crypto-ethereum bg-clip-text text-transparent;
+  }
+}
+
+/* Enhanced animation utilities */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  .animate-slide-down {
+    animation: slideDown 0.3s ease-out;
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+  
+  .animate-expand {
+    animation: expand 0.3s ease-out;
+  }
+  
+  .animate-collapse {
+    animation: collapse 0.3s ease-in;
+  }
+}
+
+/* Responsive design utilities */
+@layer utilities {
+  .container-padding {
+    @apply px-4 sm:px-6 lg:px-8 xl:px-10;
+  }
+  
+  .section-spacing {
+    @apply py-section;
+  }
+  
+  .component-spacing {
+    @apply py-component;
+  }
+}
+
+/* Enhanced focus states for accessibility */
+@layer utilities {
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-offset-2 focus:ring-offset-dark-900;
+  }
+  
+  .focus-visible-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-900;
+  }
+}
+
+/* Chart styling overrides */
+.chartjs-tooltip {
+  @apply backdrop-blur-sm bg-dark-800/95 border border-glass-border rounded-lg shadow-elevated;
+}
+
+/* Button component styles */
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-all duration-200 font-medium shadow-lg hover:shadow-xl focus-ring;
+  }
+  
+  .btn-secondary {
+    @apply px-4 py-2 bg-glass-white hover:bg-white/10 text-text-secondary hover:text-text-primary border border-glass-border rounded-lg transition-all duration-200 font-medium focus-ring backdrop-blur-sm;
+  }
+  
+  .btn-ghost {
+    @apply px-4 py-2 text-text-secondary hover:text-text-primary hover:bg-glass-white/30 rounded-lg transition-all duration-200 font-medium focus-ring;
+  }
+}
+
+/* Enhanced table styles */
+@layer components {
+  .table-row {
+    @apply border-b border-glass-border/30 hover:bg-glass-white/20 transition-all duration-200;
+  }
+  
+  .table-header {
+    @apply text-left text-text-tertiary text-sm font-semibold py-4 px-4 bg-glass-white/10 border-b border-glass-border;
+  }
+  
+  .table-cell {
+    @apply py-4 px-4 text-text-secondary;
+  }
+}
+
+/* Loading animation improvements */
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Improved accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-delay: -1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    background-attachment: initial !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .glass-effect {
+    @apply border-2 border-white/50;
+  }
+  
+  .text-text-tertiary {
+    @apply text-white/80;
+  }
+  
+  .text-text-muted {
+    @apply text-white/70;
+  }
+}
