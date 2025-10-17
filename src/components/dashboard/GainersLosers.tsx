@@ -39,7 +39,7 @@ const GainersLosers: React.FC = () => {
               <span className="font-medium text-text-secondary">{coin.name}</span>
             </div>
             <span className={coin.price_change_percentage_24h >= 0 ? 'text-crypto-green' : 'text-crypto-red'}>
-              {coin.price_change_percentage_24h.toFixed(2)}%
+              {(coin.price_change_percentage_24h ?? 0).toFixed(2)}%
             </span>
           </div>
         ))}

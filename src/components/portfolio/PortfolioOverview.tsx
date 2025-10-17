@@ -140,7 +140,7 @@ const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({
                       </td>
                       
                       <td className="py-4 px-2">
-                        <span className="text-white">{asset.amount.toFixed(6)}</span>
+                        <span className="text-white">{(asset.amount ?? 0).toFixed(6)}</span>
                       </td>
                       
                       <td className="py-4 px-2">

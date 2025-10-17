@@ -20,21 +20,21 @@ const MarketOverview: React.FC<MarketOverviewProps> = ({ data }) => {
   const stats = [
     {
       title: 'Total Market Cap',
-      value: data ? `$${(data.totalMarketCap / 1e12).toFixed(2)}T` : '$2.45T',
+      value: data?.totalMarketCap ? `$${(data.totalMarketCap / 1e12).toFixed(2)}T` : '$2.45T',
       change: data?.marketCapChange24h ?? 2.34,
       icon: DollarSign,
       color: 'primary'
     },
     {
       title: '24h Volume',
-      value: data ? `$${(data.totalVolume / 1e9).toFixed(0)}B` : '$89.2B',
+      value: data?.totalVolume ? `$${(data.totalVolume / 1e9).toFixed(0)}B` : '$89.2B',
       change: 1.23, // Default value, as this is not in the global endpoint response
       icon: Activity,
       color: 'green'
     },
     {
       title: 'Bitcoin Dominance',
-      value: data ? `${data.bitcoinDominance.toFixed(1)}%` : '54.2%',
+      value: data?.bitcoinDominance ? `${data.bitcoinDominance.toFixed(1)}%` : '54.2%',
       change: -0.45, // Default value, as this is not in the global endpoint response
       icon: TrendingUp,
       color: 'bitcoin'
@@ -109,7 +109,7 @@ const MarketOverview: React.FC<MarketOverviewProps> = ({ data }) => {
                       <span className={`text-sm font-semibold ${
                         isPositive ? 'text-crypto-green' : 'text-crypto-red'
                       }`}>
-                        {isPositive ? '+' : ''}{stat.change.toFixed(2)}%
+                        {isPositive ? '+' : ''}{(stat.change ?? 0).toFixed(2)}%
                       </span>
                       <span className="text-text-muted text-xs">24h</span>
                     </div>

@@ -147,7 +147,7 @@ function AppContent() {
                           <p className={`font-bold text-2xl ${
                             portfolioStats.totalProfitPercentage >= 0 ? 'text-crypto-green' : 'text-crypto-red'
                           }`}>
-                            {portfolioStats.totalProfitPercentage >= 0 ? '+' : ''}{portfolioStats.totalProfitPercentage.toFixed(2)}%
+                            {portfolioStats.totalProfitPercentage >= 0 ? '+' : ''}{(portfolioStats.totalProfitPercentage ?? 0).toFixed(2)}%
                           </p>
                         </div>
                       </div>

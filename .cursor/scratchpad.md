@@ -184,7 +184,7 @@ The current implementation includes:
 
 **Issues**:
 1. ✅ TypeScript compilation errors - FIXED
-2. 🔴 Runtime crash: "Cannot read properties of undefined (reading 'toFixed')" - NEXT
+2. ✅ Runtime crash: "Cannot read properties of undefined (reading 'toFixed')" - FIXED
 3. ✅ Unsafe proxy dependency (dev-only tooling in critical path) - FIXED
 4. ✅ No environment configuration for production - FIXED
 
@@ -195,7 +195,12 @@ The current implementation includes:
   - Removed proxy configuration from `vite.config.ts`
   - Added `.env.example` for documentation
   - Dev server running successfully on port 5173
-- ⏳ Task 0.2 PENDING: Comprehensive null safety fixes
+- ✅ Task 0.2 COMPLETE: Comprehensive null safety fixes
+  - Fixed `GainersLosers.tsx`: Added null check for `price_change_percentage_24h.toFixed(2)`
+  - Fixed `MarketOverview.tsx`: Added null checks for all stats using `.toFixed()`
+  - Fixed `App.tsx`: Added null check for `totalProfitPercentage.toFixed(2)`
+  - Fixed `PortfolioOverview.tsx`: Added null check for `asset.amount.toFixed(6)`
+  - Used optional chaining (`?.`) and nullish coalescing (`??`) consistently
 - ⏳ Task 0.3 PENDING: Error handling & loading states
 - ⏳ Task 0.4 PENDING: Testing & validation
 
@@ -220,6 +225,14 @@ The current implementation includes:
 - ✅ API base URL configured via environment variables
 - ✅ Code is identical for dev, preview, and production environments
 - ✅ No dev-only tooling in critical path
+
+**Recent Updates**:
+- ✅ **Task 0.1 COMPLETE & COMMITTED**: Proxy dependency removed, environment config added
+- ✅ **Documentation Updated**:
+  - Created comprehensive README.md with project overview, features, quick start
+  - Created DEPLOYMENT.md with deployment guides for multiple platforms (Vercel, Netlify, GitHub Pages, Docker, VPS)
+  - Separated technical deployment details from user-facing README (best practice)
+- ✅ **Chart.js Issue Fixed**: Added missing Filler plugin for filled area charts
 
 **Request for User**:
 Please test the application in your browser at `http://localhost:5173` to verify:
@@ -265,3 +278,36 @@ Once verified, I'm ready to proceed with **Task 0.2: Add Comprehensive Null Safe
 - Verify error states by testing with failed/empty API responses
 - Build success ≠ runtime success - always test in the browser after building
 - **Use network throttling and offline mode in DevTools to test error handling**
+
+### Documentation Best Practices ⭐
+- **Separate user-facing documentation from technical deployment guides**
+  - README.md: Project overview, features, quick start, basic usage
+  - DEPLOYMENT.md: Platform-specific deployment instructions, configuration details
+  - CONTRIBUTING.md: Guidelines for contributors (when applicable)
+- Keep README.md concise and welcoming to new users
+- Include badges, emojis, and clear sections for better readability
+- Always provide example environment variables and configuration
+- Link to additional documentation from README for deeper topics
+
+### Chart.js Plugin Management ⭐
+- **ALWAYS import and register plugins explicitly when using advanced features**
+  - Filler plugin required for `fill: true` option in datasets
+  - TimeScale plugin needed for time-based charts
+  - Other plugins may be required for specific chart types or features
+- **Import plugins from 'chart.js' package, not from separate packages**
+  ```typescript
+  import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    Filler, // Required for fill: true
+    TimeScale, // Required for time charts
+    // ... other plugins
+  } from 'chart.js';
+  ```
+- **Register plugins immediately after import**
+  ```typescript
+  ChartJS.register(CategoryScale, LinearScale, Filler, TimeScale);
+  ```
+- **Chart.js warnings indicate missing plugins - always fix these to prevent runtime issues**
+- **Test charts after adding new plugins to ensure they work correctly**

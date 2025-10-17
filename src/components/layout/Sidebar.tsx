@@ -86,7 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
           })}
         </nav>
 
-        {/* Footer */}
+        {/* Footer
         <div className="mt-auto pt-6">
           <SectionSeparator variant="line" spacing="sm" />
           <div className="p-4 rounded-xl bg-gradient-to-r from-crypto-bitcoin/10 to-crypto-ethereum/10 border border-glass-border/50">
@@ -101,13 +101,13 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
                   <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
                 </div>
               </div>
-              <div>
+              {/* <div>
                 <p className="text-text-primary font-semibold text-sm">BTC</p>
                 <p className="text-crypto-bitcoin text-xs font-medium">Live Price</p>
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </GlassCard>
     </div>
   );
