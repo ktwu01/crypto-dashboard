@@ -4,6 +4,7 @@ import { TrendingUp, TrendingDown, Activity, DollarSign } from 'lucide-react';
 import GlassCard from '../ui/GlassCard';
 import Icon from '../ui/Icon';
 import SectionSeparator from '../ui/SectionSeparator';
+import TrendingCoins from './TrendingCoins';
 
 interface MarketOverviewProps {
   data?: {
@@ -38,7 +39,7 @@ const MarketOverview: React.FC<MarketOverviewProps> = ({ data }) => {
       color: 'bitcoin'
     },
     {
-      title: 'Active Cryptocurrencies',
+      title: 'Active Cryptos',
       value: '13,247',
       change: 0.89,
       icon: Activity,
@@ -129,6 +130,7 @@ const MarketOverview: React.FC<MarketOverviewProps> = ({ data }) => {
             </motion.div>
           );
         })}
+        <TrendingCoins />
       </div>
     </div>
   );

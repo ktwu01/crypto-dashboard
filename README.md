@@ -1,3 +1,5 @@
+This project is a fork of the Minimax hackathon [project](https://agent.minimax.io/share/300474460274837) provided by @Zillizezz
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

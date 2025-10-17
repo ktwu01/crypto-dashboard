@@ -107,6 +107,16 @@ class CryptoApiService {
     }
   }
 
+  async getTrendingCoins(): Promise<any> {
+    try {
+      const response = await this.api.get('/search/trending');
+      return response.data.coins.slice(0, 3);
+    } catch (error) {
+      console.error('Error fetching trending coins:', error);
+      throw error;
+    }
+  }
+
   // Format currency values
   static formatCurrency(value: number, decimals = 2): string {
     if (value >= 1e12) {
