@@ -5,6 +5,7 @@ import GlassCard from '../ui/GlassCard';
 import Icon from '../ui/Icon';
 import SectionSeparator from '../ui/SectionSeparator';
 import TrendingCoins from './TrendingCoins';
+import GainersLosers from './GainersLosers';
 
 interface MarketOverviewProps {
   data?: {
@@ -20,28 +21,28 @@ const MarketOverview: React.FC<MarketOverviewProps> = ({ data }) => {
     {
       title: 'Total Market Cap',
       value: data ? `$${(data.totalMarketCap / 1e12).toFixed(2)}T` : '$2.45T',
-      change: data?.marketCapChange24h || 2.34,
+      change: data?.marketCapChange24h ?? 2.34,
       icon: DollarSign,
       color: 'primary'
     },
     {
       title: '24h Volume',
       value: data ? `$${(data.totalVolume / 1e9).toFixed(0)}B` : '$89.2B',
-      change: 1.23,
+      change: 1.23, // Default value, as this is not in the global endpoint response
       icon: Activity,
       color: 'green'
     },
     {
       title: 'Bitcoin Dominance',
       value: data ? `${data.bitcoinDominance.toFixed(1)}%` : '54.2%',
-      change: -0.45,
+      change: -0.45, // Default value, as this is not in the global endpoint response
       icon: TrendingUp,
       color: 'bitcoin'
     },
     {
       title: 'Active Cryptos',
-      value: '13,247',
-      change: 0.89,
+      value: '13,247', // This is a static value in the original code
+      change: 0.89, // Default value
       icon: Activity,
       color: 'ethereum'
     }
@@ -131,6 +132,7 @@ const MarketOverview: React.FC<MarketOverviewProps> = ({ data }) => {
           );
         })}
         <TrendingCoins />
+        <GainersLosers />
       </div>
     </div>
   );

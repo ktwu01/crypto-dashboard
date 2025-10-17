@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://api.coingecko.com/api/v3';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.coingecko.com/api/v3';
 
 export interface CryptoCurrency {
   id: string;
@@ -113,6 +113,27 @@ class CryptoApiService {
       return response.data.coins.slice(0, 3);
     } catch (error) {
       console.error('Error fetching trending coins:', error);
+      throw error;
+    }
+  }
+
+  async getGainersAndLosers(): Promise<{ gainers: CryptoCurrency[]; losers: CryptoCurrency[] }> {
+    try {
+      const response = await this.api.get(
+        `/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false&locale=en`
+      );
+      const coins: CryptoCurrency[] = response.data;
+
+      const sortedByChange = [...coins].sort(
+        (a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h
+      );
+
+      const gainers = sortedByChange.slice(0, 5);
+      const losers = sortedByChange.slice(-5).reverse();
+
+      return { gainers, losers };
+    } catch (error) {
+      console.error('Error fetching gainers and losers:', error);
       throw error;
     }
   }
