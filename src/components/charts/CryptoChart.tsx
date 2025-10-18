@@ -14,9 +14,9 @@ import {
 } from 'chart.js';
 import { motion } from 'framer-motion';
 import GlassCard from '../ui/GlassCard';
-import { MarketChartData } from '@/services/cryptoApi';
-import { sma, rsi, macd } from 'technicalindicators';
-import { Info } from 'lucide-react';
+import { MarketChartData, CryptoCurrency } from '@/services/cryptoApi';
+import { sma, rsi, macd, ema } from 'technicalindicators';
+import { Info, ChevronsUpDown } from 'lucide-react';
 
 ChartJS.register(
   CategoryScale,
@@ -29,14 +29,20 @@ ChartJS.register(
   Filler
 );
 
-interface BitcoinChartProps {
+interface CryptoChartProps {
+  coin?: CryptoCurrency;
+  allCoins: CryptoCurrency[];
+  onCoinChange: (coin: CryptoCurrency) => void;
   data?: MarketChartData;
   loading?: boolean;
   timeframe?: string;
   onTimeframeChange?: (timeframe: string) => void;
 }
 
-const BitcoinChart: React.FC<BitcoinChartProps> = ({ 
+const CryptoChart: React.FC<CryptoChartProps> = ({ 
+  coin,
+  allCoins,
+  onCoinChange,
   data, 
   loading, 
   timeframe = '7',
@@ -44,6 +50,7 @@ const BitcoinChart: React.FC<BitcoinChartProps> = ({
 }) => {
   const [activeIndicators, setActiveIndicators] = useState<string[]>(['price']);
   const [openInfoId, setOpenInfoId] = useState<string | null>(null);
+  const [isCoinSelectorOpen, setIsCoinSelectorOpen] = useState(false);
   const hasData = !!(data?.prices && data.prices.length > 0);
 
   const timeframes = [
@@ -57,6 +64,7 @@ const BitcoinChart: React.FC<BitcoinChartProps> = ({
   const indicators = [
     { id: 'price', label: 'Price' },
     { id: 'sma', label: 'SMA' },
+    { id: 'ema', label: 'EMA' },
     { id: 'rsi', label: 'RSI' },
     { id: 'macd', label: 'MACD' },
   ];
@@ -64,6 +72,7 @@ const BitcoinChart: React.FC<BitcoinChartProps> = ({
   const indicatorInfo: Record<string, string> = {
     price: 'Price: Asset price in USD. You can hide it to focus on indicators.',
     sma: 'SMA (50): Simple Moving Average over the last 50 periods. Needs ≥50 data points.',
+    ema: 'EMA (50): Exponential Moving Average over the last 50 periods. More responsive to recent price changes than SMA. Needs ≥50 data points.',
     rsi: 'RSI (14): Momentum oscillator (0-100). Needs ≥14 data points. Overbought >70, oversold <30.',
     macd: 'MACD (12,26,9): 12-EMA minus 26-EMA; Signal = 9-EMA of MACD. Needs ≥26 bars for MACD and ~35 for signal.',
   };
@@ -88,8 +97,8 @@ const BitcoinChart: React.FC<BitcoinChartProps> = ({
       datasets.push({
         label: 'Price',
         data: prices,
-        borderColor: '#f7931a',
-        backgroundColor: 'rgba(247, 147, 26, 0.1)',
+        borderColor: coin?.price_change_percentage_24h && coin.price_change_percentage_24h > 0 ? '#2ecc71' : '#e74c3c',
+        backgroundColor: coin?.price_change_percentage_24h && coin.price_change_percentage_24h > 0 ? 'rgba(46, 204, 113, 0.1)' : 'rgba(231, 76, 60, 0.1)',
         borderWidth: 2,
         fill: true,
         tension: 0.4,
@@ -105,6 +114,19 @@ const BitcoinChart: React.FC<BitcoinChartProps> = ({
         label: 'SMA (50)',
         data: [...Array(prices.length - smaData.length).fill(null), ...smaData],
         borderColor: '#3498db',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.4,
+        yAxisID: 'y',
+      });
+    }
+
+    if (activeIndicators.includes('ema')) {
+      const emaData = ema({ period: 50, values: prices });
+      datasets.push({
+        label: 'EMA (50)',
+        data: [...Array(prices.length - emaData.length).fill(null), ...emaData],
+        borderColor: '#1abc9c',
         borderWidth: 1.5,
         pointRadius: 0,
         tension: 0.4,
@@ -155,9 +177,9 @@ const BitcoinChart: React.FC<BitcoinChartProps> = ({
     }
 
     return { labels, datasets };
-  }, [data, activeIndicators, hasData]);
+  }, [data, activeIndicators, hasData, coin]);
 
-  const showPriceOrSma = activeIndicators.includes('price') || activeIndicators.includes('sma');
+  const showPriceOrMovingAverage = activeIndicators.includes('price') || activeIndicators.includes('sma') || activeIndicators.includes('ema');
   const showRsi = activeIndicators.includes('rsi');
   const showMacd = activeIndicators.includes('macd');
 
@@ -174,7 +196,7 @@ const BitcoinChart: React.FC<BitcoinChartProps> = ({
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
         titleColor: '#ffffff',
         bodyColor: '#ffffff',
-        borderColor: '#f7931a',
+        borderColor: coin?.price_change_percentage_24h && coin.price_change_percentage_24h > 0 ? '#2ecc71' : '#e74c3c',
         borderWidth: 1,
         cornerRadius: 8,
         padding: 12,
@@ -210,7 +232,7 @@ const BitcoinChart: React.FC<BitcoinChartProps> = ({
       },
       y: {
         type: 'linear' as const,
-        display: showPriceOrSma,
+        display: showPriceOrMovingAverage,
         position: 'left' as const,
         grid: {
           color: 'rgba(255, 255, 255, 0.1)',
@@ -256,37 +278,76 @@ const BitcoinChart: React.FC<BitcoinChartProps> = ({
     },
   };
 
+  if (!coin) {
+    return (
+      <GlassCard className="p-6 h-[488px] flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full" />
+      </GlassCard>
+    )
+  }
+
   return (
     <GlassCard className="p-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-start justify-between mb-6">
         <div className="flex items-center space-x-4">
           <img 
-            src="/images/crypto/clean_bitcoin_cryptocurrency_icon_logo.jpg" 
-            alt="Bitcoin" 
+            src={coin.image}
+            alt={coin.name} 
             className="w-10 h-10 rounded-full"
           />
           <div>
-            <h2 className="text-xl font-bold text-white">Bitcoin (BTC)</h2>
+            <h2 className="text-xl font-bold text-white">{coin.name} ({coin.symbol.toUpperCase()})</h2>
             <p className="text-white/60 text-sm">Price Chart</p>
           </div>
         </div>
-        
-        <div className="flex items-center space-x-2">
-          {onTimeframeChange && timeframes.map((tf) => (
-            <motion.button
-              key={tf.value}
-              onClick={() => onTimeframeChange?.(tf.value)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                timeframe === tf.value
-                  ? 'bg-primary-500 text-white'
-                  : 'text-white/60 hover:text-white hover:bg-white/10'
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+
+        <div className="flex flex-col items-end space-y-2">
+          {/* Coin Selector */}
+          <div className="relative">
+            <button
+              onClick={() => setIsCoinSelectorOpen(!isCoinSelectorOpen)}
+              className="flex items-center justify-between w-48 px-3 py-2 text-white bg-white/5 rounded-lg hover:bg-white/10"
             >
-              {tf.label}
-            </motion.button>
-          ))}
+              <span className="font-medium">{coin.name}</span>
+              <ChevronsUpDown className="w-4 h-4 text-white/60" />
+            </button>
+            {isCoinSelectorOpen && (
+              <div className="absolute z-20 w-48 mt-1 bg-dark-800 border border-white/10 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                {allCoins.map(c => (
+                  <button
+                    key={c.id}
+                    onClick={() => {
+                      onCoinChange(c);
+                      setIsCoinSelectorOpen(false);
+                    }}
+                    className="w-full text-left px-3 py-2 hover:bg-white/5 flex items-center space-x-2"
+                  >
+                    <img src={c.image} alt={c.name} className="w-5 h-5 rounded-full" />
+                    <span>{c.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          {/* Timeframe Selector */}
+          <div className="flex items-center space-x-2">
+            {onTimeframeChange && timeframes.map((tf) => (
+              <motion.button
+                key={tf.value}
+                onClick={() => onTimeframeChange?.(tf.value)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  timeframe === tf.value
+                    ? 'bg-primary-500 text-white'
+                    : 'text-white/60 hover:text-white hover:bg-white/10'
+                }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {tf.label}
+              </motion.button>
+            ))}
+          </div>
         </div>
       </div>
       
@@ -344,4 +405,4 @@ const BitcoinChart: React.FC<BitcoinChartProps> = ({
   );
 };
 
-export default BitcoinChart;
+export default CryptoChart;

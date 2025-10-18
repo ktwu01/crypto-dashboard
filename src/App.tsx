@@ -12,7 +12,7 @@ import {
 import Sidebar from './components/layout/Sidebar';
 import MarketOverview from './components/dashboard/MarketOverview';
 import CryptoTable from './components/markets/CryptoTable';
-import BitcoinChart from './components/charts/BitcoinChart';
+import CryptoChart from './components/charts/CryptoChart';
 import PortfolioOverview from './components/portfolio/PortfolioOverview';
 import AddAssetModal from './components/portfolio/AddAssetModal';
 import Loading from './components/ui/Loading';
@@ -29,7 +29,8 @@ function AppContent() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedCrypto, setSelectedCrypto] = useState<CryptoCurrency | undefined>();
   const [showAddAssetModal, setShowAddAssetModal] = useState(false);
-  const [bitcoinTimeframe, setBitcoinTimeframe] = useState('7');
+  const [chartTimeframe, setChartTimeframe] = useState('7');
+  const [chartCoin, setChartCoin] = useState<CryptoCurrency | undefined>();
   
   const {
     portfolio,
@@ -47,6 +48,14 @@ function AppContent() {
     staleTime: 25000, // Consider data stale after 25 seconds
   });
 
+  // Set Bitcoin as the default chart coin once crypto data is loaded
+  useEffect(() => {
+    if (!chartCoin && cryptocurrencies && cryptocurrencies.length > 0) {
+      const bitcoin = cryptocurrencies.find(c => c.id === 'bitcoin');
+      setChartCoin(bitcoin || cryptocurrencies[0]);
+    }
+  }, [cryptocurrencies, chartCoin]);
+
   // Fetch global market data
   const { data: globalData, isLoading: globalLoading } = useQuery({
     queryKey: ['global-market'],
@@ -55,12 +64,16 @@ function AppContent() {
     staleTime: 50000,
   });
 
-  // Fetch Bitcoin chart data
-  const { data: bitcoinChart, isLoading: chartLoading } = useQuery({
-    queryKey: ['bitcoin-chart', bitcoinTimeframe],
-    queryFn: () => cryptoApiService.getMarketChart('bitcoin', bitcoinTimeframe),
-    refetchInterval: bitcoinTimeframe === '1' ? 10000 : 60000, // More frequent updates for 1D
-    staleTime: bitcoinTimeframe === '1' ? 5000 : 30000,
+  // Fetch chart data for the selected coin
+  const { data: marketChartData, isLoading: chartLoading } = useQuery({
+    queryKey: ['market-chart', chartCoin?.id, chartTimeframe],
+    queryFn: () => {
+      if (!chartCoin) return Promise.resolve(undefined);
+      return cryptoApiService.getMarketChart(chartCoin.id, chartTimeframe);
+    },
+    enabled: !!chartCoin, // Only run query if a coin is selected
+    refetchInterval: chartTimeframe === '1' ? 10000 : 60000,
+    staleTime: chartTimeframe === '1' ? 5000 : 30000,
   });
 
   // Update portfolio prices when crypto data changes
@@ -109,11 +122,14 @@ function AppContent() {
             <SectionSeparator variant="gradient" spacing="lg" withLabel="Trading & Analytics" />
             
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-component">
-              <BitcoinChart 
-                data={bitcoinChart}
+              <CryptoChart
+                coin={chartCoin}
+                data={marketChartData}
                 loading={chartLoading}
-                timeframe={bitcoinTimeframe}
-                onTimeframeChange={setBitcoinTimeframe}
+                timeframe={chartTimeframe}
+                onTimeframeChange={setChartTimeframe}
+                allCoins={cryptocurrencies || []}
+                onCoinChange={setChartCoin}
               />
               
               <div className="space-y-6">
@@ -280,11 +296,14 @@ function AppContent() {
             
             <SectionSeparator variant="gradient" spacing="md" />
             
-            <BitcoinChart 
-              data={bitcoinChart}
+            <CryptoChart
+              coin={chartCoin}
+              data={marketChartData}
               loading={chartLoading}
-              timeframe={bitcoinTimeframe}
-              onTimeframeChange={setBitcoinTimeframe}
+              timeframe={chartTimeframe}
+              onTimeframeChange={setChartTimeframe}
+              allCoins={cryptocurrencies || []}
+              onCoinChange={setChartCoin}
             />
             
             <SectionSeparator variant="dots" spacing="lg" />
