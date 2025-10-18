@@ -10,7 +10,8 @@ import {
   Tooltip,
   Legend,
   Filler,
-  ChartOptions
+  ChartOptions,
+  BarElement
 } from 'chart.js';
 import { motion } from 'framer-motion';
 import GlassCard from '../ui/GlassCard';
@@ -23,6 +24,7 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
@@ -74,8 +76,12 @@ const CryptoChart: React.FC<CryptoChartProps> = ({
     sma: 'SMA (50): Simple Moving Average over the last 50 periods. Needs ≥50 data points.',
     ema: 'EMA (50): Exponential Moving Average over the last 50 periods. More responsive to recent price changes than SMA. Needs ≥50 data points.',
     rsi: 'RSI (14): Momentum oscillator (0-100). Needs ≥14 data points. Overbought >70, oversold <30.',
-    macd: 'MACD (12,26,9): 12-EMA minus 26-EMA; Signal = 9-EMA of MACD. Needs ≥26 bars for MACD and ~35 for signal.',
+    macd: 'MACD (12,26,9): Trend-following momentum. Not predictive. MACD (Blue line) = 12-EMA − 26-EMA; Signal (Green line) = 9-EMA of MACD. Histogram = MACD − Signal: Green (>0) shows bullish momentum, Red (<0) bearish. Growing bars = accelerating momentum; shrinking bars = waning momentum; crossing 0 = momentum flip.',
   };
+
+// 这玩意看起来一点用处也没有啊。是不是大家都已经知道了，所以市场不符合这个规矩了？正如唐纳德·T·坎贝尔所说：“任何定量社会指标被用于社会决策的次数越多，它就越容易受到腐败压力的影响，并且越容易扭曲和破坏它旨在监测的社会过程。
+// MACD (12,26,9)：趋势跟随型动量，非预测。MACD=12EMA−26EMA；Signal=MACD的9EMA；直方图=MACD−Signal。
+// 用法：仅在趋势市作为动量/方向参考，结合位置与结构；多周期过滤（如仅顺200EMA方向）；等收盘确认金叉/死叉；直方图变短=动量衰减，跨越0=动量翻转；价格-指标背离在关键位更可信。务必配合风险管理与回测验证。
 
   const handleIndicatorToggle = (id: string) => {
     setActiveIndicators(prev => 
@@ -156,10 +162,22 @@ const CryptoChart: React.FC<CryptoChartProps> = ({
         SimpleMAOscillator: false,
         SimpleMASignal: false,
       });
+      const padCount = prices.length - macdData.length;
+      const macdLine = [...Array(padCount).fill(null), ...macdData.map(d => d.MACD)];
+      const signalLine = [...Array(padCount).fill(null), ...macdData.map(d => d.signal)];
+      const histData = [...Array(padCount).fill(null), ...macdData.map(d => d.histogram ?? 0)];
+
+      // Colors for histogram: green above zero, red below zero, transparent for nulls
+      const greenFill = 'rgba(46, 204, 113, 0.5)';
+      const redFill = 'rgba(231, 76, 60, 0.5)';
+      const transparent = 'rgba(0,0,0,0)';
+      const histBg = histData.map(v => (v === null ? transparent : (v >= 0 ? greenFill : redFill)));
+      const histBorder = histBg; // Keep border same as fill for clarity
+
       datasets.push({
         label: 'MACD',
-        data: [...Array(prices.length - macdData.length).fill(null), ...macdData.map(d => d.MACD)],
-        borderColor: '#e74c3c',
+        data: macdLine,
+        borderColor: '#3498db',
         borderWidth: 1.5,
         pointRadius: 0,
         tension: 0.4,
@@ -167,12 +185,21 @@ const CryptoChart: React.FC<CryptoChartProps> = ({
       });
       datasets.push({
         label: 'Signal Line',
-        data: [...Array(prices.length - macdData.length).fill(null), ...macdData.map(d => d.signal)],
+        data: signalLine,
         borderColor: '#2ecc71',
         borderWidth: 1.5,
         pointRadius: 0,
         tension: 0.4,
         yAxisID: 'yMacd',
+      });
+      datasets.push({
+        label: 'Histogram',
+        data: histData,
+        backgroundColor: histBg,
+        borderColor: histBorder,
+        borderWidth: 1,
+        yAxisID: 'yMacd',
+        type: 'bar',
       });
     }
 
@@ -208,7 +235,9 @@ const CryptoChart: React.FC<CryptoChartProps> = ({
               label += ': ';
             }
             if (context.parsed.y !== null) {
-              if (context.dataset.yAxisID === 'y') {
+              if (context.dataset.label === 'Histogram') {
+                label += context.parsed.y.toFixed(4);
+              } else if (context.dataset.yAxisID === 'y') {
                 label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
               } else {
                 label += context.parsed.y.toFixed(2);
@@ -295,14 +324,6 @@ const CryptoChart: React.FC<CryptoChartProps> = ({
             alt={coin.name} 
             className="w-10 h-10 rounded-full"
           />
-          <div>
-            <h2 className="text-xl font-bold text-white">{coin.name} ({coin.symbol.toUpperCase()})</h2>
-            <p className="text-white/60 text-sm">Price Chart</p>
-          </div>
-        </div>
-
-        <div className="flex flex-col items-end space-y-2">
-          {/* Coin Selector */}
           <div className="relative">
             <button
               onClick={() => setIsCoinSelectorOpen(!isCoinSelectorOpen)}
@@ -328,26 +349,26 @@ const CryptoChart: React.FC<CryptoChartProps> = ({
                 ))}
               </div>
             )}
+            <p className="text-white/60 text-sm mt-2">Price Chart</p>
           </div>
-          
-          {/* Timeframe Selector */}
-          <div className="flex items-center space-x-2">
-            {onTimeframeChange && timeframes.map((tf) => (
-              <motion.button
-                key={tf.value}
-                onClick={() => onTimeframeChange?.(tf.value)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  timeframe === tf.value
-                    ? 'bg-primary-500 text-white'
-                    : 'text-white/60 hover:text-white hover:bg-white/10'
-                }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {tf.label}
-              </motion.button>
-            ))}
-          </div>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          {onTimeframeChange && timeframes.map((tf) => (
+            <motion.button
+              key={tf.value}
+              onClick={() => onTimeframeChange?.(tf.value)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                timeframe === tf.value
+                  ? 'bg-primary-500 text-white'
+                  : 'text-white/60 hover:text-white hover:bg-white/10'
+              }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {tf.label}
+            </motion.button>
+          ))}
         </div>
       </div>
       

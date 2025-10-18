@@ -44,8 +44,8 @@ function AppContent() {
   const { data: cryptocurrencies, isLoading: cryptoLoading, error: cryptoError } = useQuery({
     queryKey: ['cryptocurrencies'],
     queryFn: () => cryptoApiService.getTopCryptocurrencies(50),
-    refetchInterval: 30000, // Refetch every 30 seconds
-    staleTime: 25000, // Consider data stale after 25 seconds
+    refetchInterval: 60000, // Refetch every 60 seconds
+    staleTime: 50000, 
   });
 
   // Set Bitcoin as the default chart coin once crypto data is loaded
@@ -60,8 +60,8 @@ function AppContent() {
   const { data: globalData, isLoading: globalLoading } = useQuery({
     queryKey: ['global-market'],
     queryFn: () => cryptoApiService.getGlobalMarketData(),
-    refetchInterval: 60000, // Refetch every minute
-    staleTime: 50000,
+    refetchInterval: 90000, // Refetch every 90 seconds
+    staleTime: 80000,
   });
 
   // Fetch chart data for the selected coin
@@ -72,8 +72,8 @@ function AppContent() {
       return cryptoApiService.getMarketChart(chartCoin.id, chartTimeframe);
     },
     enabled: !!chartCoin, // Only run query if a coin is selected
-    refetchInterval: chartTimeframe === '1' ? 10000 : 60000,
-    staleTime: chartTimeframe === '1' ? 5000 : 30000,
+    refetchInterval: chartTimeframe === '1' ? 60000 : 120000, // 1 min for 1D, 2 mins for others
+    staleTime: chartTimeframe === '1' ? 50000 : 110000,
   });
 
   // Update portfolio prices when crypto data changes

@@ -16,6 +16,10 @@ The current implementation includes:
 
 The initial version of the application had several critical infrastructure issues, including a dependency on a development-only proxy, a lack of environment configuration, and unsafe data access patterns that could cause runtime crashes. These issues have been fully resolved in Phase 0.
 
+## Key Challenges and Analysis (Planner)
+- MACD Histogram color bug: Current implementation supplies per-bar colors only for the unpadded MACD array, while the dataset `data` is padded with leading nulls to align with labels. This length mismatch causes Chart.js to reuse colors, leading to mixed green/red even when all visible bars are positive. Best practice is sign-based coloring: green above zero, red below zero, with color arrays matching the full dataset length (including padding with transparent for nulls).
+- Optional enhancement: Differentiate acceleration/deceleration by using lighter/darker shades based on histogram slope (delta). Common but not strictly required.
+
 ## High-level Task Breakdown
 
 ### Phase 0: Critical Infrastructure Fixes (COMPLETED)
@@ -54,7 +58,8 @@ The initial version of the application had several critical infrastructure issue
 - [x] **Task 2.6: Indicator Info Tooltips (SMA/RSI/MACD)**
 - [x] **Task 2.7: Price Visibility Toggle (Indicators-only Mode)**
 - [x] **Task 2.8: Chart Coin Selector (BTC → selectable)**
-
+- [x] Task 2.9 The "coin selector" should be placed above "Price Chart": That means the coin selector button should be replacing the current "coin name" button. This allows it to be more simple.
+- [x] **Task 2.8.1: Fix MACD Histogram Colors (sign-based)**
 
 ### Phase 1
 - [ ] On-Chain Data Integration
@@ -74,10 +79,11 @@ The initial version of the application had several critical infrastructure issue
 - Lint: no issues in `src/components/charts/BitcoinChart.tsx`
 
 **Next**:
-- Implement Task 2.8 (Chart Coin Selector) after approval
+- Optional enhancements (2.8.2 shade-by-momentum, 2.8.3 zero baseline) are deferred for now.
 
 ### Executor's Feedback or Assistance Requests
 - **Task 2.8 is complete.** The chart now features a coin selector, allowing you to view the chart for any of the top 50 cryptocurrencies. Please test this feature.
+- **Task 2.8.1 is complete.** MACD histogram colors now follow sign-based coloring with padded color arrays to prevent reuse artifacts. Optional enhancements are postponed.
 - I was unable to commit the previous changes as requested because the project is not a git repository. Please advise if you would like me to initialize one.
 
 ### Lessons
