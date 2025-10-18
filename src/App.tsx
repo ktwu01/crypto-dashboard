@@ -315,10 +315,10 @@ function AppContent() {
               >
                 <div className="space-y-3">
                   {[
-                    { icon: TrendingUp, title: 'Multiple Timeframes', desc: '1D, 7D, 30D, 90D, 1Y views' },
-                    { icon: Activity, title: 'Interactive Tooltips', desc: 'Hover for detailed price information' },
-                    { icon: BarChart3, title: 'Real-time Updates', desc: 'Live data with automatic refresh' },
-                    { icon: Wallet, title: 'Technical Indicators', desc: 'Coming soon: RSI, MACD, Moving Averages' }
+                    // { icon: TrendingUp, title: 'Multiple Timeframes', desc: '1D, 7D, 30D, 90D, 1Y views' },
+                    // { icon: Activity, title: 'Interactive Tooltips', desc: 'Hover for detailed price information' },
+                    // { icon: BarChart3, title: 'Real-time Updates', desc: 'Live data with automatic refresh' },
+                    // { icon: Wallet, title: 'Technical Indicators', desc: 'Coming soon: RSI, MACD, Moving Averages' }
                   ].map((feature, index) => (
                     <div key={index} className="flex items-start space-x-3 p-3 rounded-lg bg-glass-white/20 border border-glass-border/50">
                       <div className="p-2 rounded-lg bg-glass-white/30">
