@@ -34,18 +34,56 @@ The initial version of the application had several critical infrastructure issue
 - **Solution**: We will use the browser's `localStorage` to store user portfolio and watchlist data. This approach is simple, client-only, and effective for persisting data on the user's device without needing a backend. It addresses the need for a "temporary database" as suggested.
 
 **Task 2.7.5: Add EMA Indicator (Completed)**
-- **Success Criteria**: Add an EMA (Exponential Moving Average, e.g., 50-period) as a selectable indicator, similar to the existing SMA. This includes a UI toggle, rendering the line on the chart, and adding an explanatory tooltip. The EMA should be more responsive to recent price changes than the SMA.
+- **Successed**: Add an EMA (Exponential Moving Average, e.g., 50-period) as a selectable indicator, similar to the existing SMA. This includes a UI toggle, rendering the line on the chart, and adding an explanatory tooltip. The EMA should be more responsive to recent price changes than the SMA.
 
 **Task 2.8: Chart Coin Selector (BTC → selectable) (Completed)**
-- **Success Criteria**: Add a simple selector (dropdown or search) to choose the coin id (e.g., BTC, ETH). Chart updates data and indicators for the selected coin, preserving timeframe and indicator toggles.
+- **Successed**: Add a simple selector (dropdown or search) to choose the coin id (e.g., BTC, ETH). Chart updates data and indicators for the selected coin, preserving timeframe and indicator toggles.
 
-==== Stop here waiting for user approval before next task. Without user approval, do not do git commit or push. ====
+### Phase 3: AI Briefing MVP (Do-It-Quick)
 
-### Phase 3: AI-Powered Insights and Growth Strategy
+**Objective:** Ship the fastest possible daily briefing so users see AI value this sprint. Favour simplicity over polish.
 
-- **AI-Powered Daily Briefing:** Use an LLM to generate a daily summary of market trends. This should be added in the `AI Insights` portal (Create A new portal) As several cells.
-- **User Accounts & Personalization:** Develop a user account system.
-- **Explore SaaS Model:** Investigate a potential SaaS subscription model.
+**Constraints:** No new infra; reuse existing Coingecko data; manual refresh acceptable; brief should load in <2 seconds. AI Insights refreshes at most once per TTL window.
+
+#### 3.1 Input Snippet
+- Reuse the top coins API we already hit. Slice out BTC/ETH + 3 biggest movers and today’s global stats.
+- Normalize into a lightweight JSON (prices, 24h change, dominance). Skip news sentiment for now.
+- Document in code so we can swap in richer sources later.
+
+#### 3.2 Briefing Generator (On-Demand)
+- Add a single serverless (or Vite dev proxy) endpoint that builds the prompt and calls the chosen LLM.
+- Keep the prompt tiny: intro + movers + quick risk note. Cap tokens to control cost.
+- Return a simple JSON array of `[{title, body}]` cells. If the LLM fails, fall back to a canned “data unavailable” message.
+- Run on-demand when the user opens the widget; no cron job yet.
+
+#### 3.3 Frontend Portal
+- Create an `AiInsights` section on the dashboard with 3 cards (`Market Pulse`, `Movers`, `Risk Watch`).
+- Call the endpoint on mount, show skeleton loaders, and surface errors via a single inline banner.
+- Cache the successful briefing in local storage with a configurable TTL (default 1 hour) so the dashboard always shows the last good result for the entire window—even across reloads. Allow the TTL to be switched to 24h by tweaking a single constant.
+- Auto-refresh logic: retry every 2 minutes until the first successful fetch; once we have a valid briefing, do not hit the API again until the TTL expires. This prevents hammering the upstream API while keeping data timely.
+- Remove the manual refresh button; reflect the last successful update time in the UI.
+- When the upstream API fails, keep serving the cached result without invoking the fallback copy; continue retry checks in the background until a successful refresh occurs or TTL expires.
+- Dashboard now opens with `AI Insights`; Market Overview and charts were moved to Markets/Charts tabs to keep the MVP lean.
+
+### Phase 4: Personalization & Growth (Post-MVP)
+
+**Objective:** Introduce user accounts for personalization and explore a SaaS model.
+
+**Milestones**
+
+#### 4.1 User Accounts & Personalization
+- **M1 – Auth Setup:** Implement a third-party authentication provider (e.g., Clerk, Auth0).
+- **M2 – Core Flows:** Build sign-up, login, and basic account management UI.
+- **M3 – User Profiles:** Store user preferences (e.g., watchlists) in a database.
+- **M4 – Secure Data:** Ensure user data is accessed securely via authenticated APIs.
+- **M5 – Personalized UX:** Use profile data to tailor the user experience (e.g., personalized AI briefings).
+
+#### 4.2 SaaS Model Exploration
+- **M1 – Research:** Analyze competitors and define potential pricing models.
+- **M2 – Packaging:** Draft feature tiers (e.g., Free vs. Pro).
+- **M3 – Technical Plan:** Outline the architecture for a paywall and billing integration (e.g., Stripe).
+- **M4 – Validation:** Test user interest with a waitlist or landing page.
+- **M5 – Recommendation:** Produce a Go/No-Go recommendation for building a paid version.
 
  
 ## Project Status Board
@@ -61,16 +99,15 @@ The initial version of the application had several critical infrastructure issue
 - [x] Task 2.9 The "coin selector" should be placed above "Price Chart": That means the coin selector button should be replacing the current "coin name" button. This allows it to be more simple.
 - [x] **Task 2.8.1: Fix MACD Histogram Colors (sign-based)**
 
-### Phase 1
-- [ ] On-Chain Data Integration
+### Phase 3 (MVP)
+- [x] Input Snippet (reuse top coins API)
+- [x] Briefing Generator Endpoint
+- [x] AI Insights Frontend Cards
+- [x] Refresh & Error Handling
 
-### Phase 2
-- [ ] Customizable Watchlist
-
-### Phase 3
-- [ ] AI-Powered Daily Briefing
+### Phase 4 (Post-MVP)
 - [ ] User Accounts & Personalization
-- [ ] Explore SaaS Model
+- [ ] SaaS Model Exploration
 
 ## Current Status / Progress Tracking
 

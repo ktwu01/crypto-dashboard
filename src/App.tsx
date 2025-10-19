@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import Sidebar from './components/layout/Sidebar';
 import MarketOverview from './components/dashboard/MarketOverview';
+import AiInsights from './components/dashboard/AiInsights';
+import DashboardMarketStats from './components/dashboard/DashboardMarketStats';
 import CryptoTable from './components/markets/CryptoTable';
 import CryptoChart from './components/charts/CryptoChart';
 import PortfolioOverview from './components/portfolio/PortfolioOverview';
@@ -105,118 +107,22 @@ function AppContent() {
 
   const portfolioStats = getPortfolioStats();
 
+  const globalOverviewData = globalData?.data
+    ? {
+        totalMarketCap: globalData.data.total_market_cap?.usd || 0,
+        marketCapChange24h: globalData.data.market_cap_change_percentage_24h_usd || 0,
+        totalVolume: globalData.data.total_volume?.usd || 0,
+        bitcoinDominance: globalData.data.market_cap_percentage?.btc || 0,
+      }
+    : undefined;
+
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
         return (
           <div className="space-y-section">
-            <MarketOverview 
-              data={globalData?.data ? {
-                totalMarketCap: globalData.data.total_market_cap?.usd || 0,
-                marketCapChange24h: globalData.data.market_cap_change_percentage_24h_usd || 0,
-                totalVolume: globalData.data.total_volume?.usd || 0,
-                bitcoinDominance: globalData.data.market_cap_percentage?.btc || 0,
-              } : undefined}
-            />
-            
-            <SectionSeparator variant="gradient" spacing="lg" withLabel="Trading & Analytics" />
-            
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-component">
-              <CryptoChart
-                coin={chartCoin}
-                data={marketChartData}
-                loading={chartLoading}
-                timeframe={chartTimeframe}
-                onTimeframeChange={setChartTimeframe}
-                allCoins={cryptocurrencies || []}
-                onCoinChange={setChartCoin}
-              />
-              
-              <div className="space-y-6">
-                {portfolio.length > 0 && (
-                  <GlassCard className="p-6" elevated gradient>
-                    <div className="flex items-center space-x-3 mb-4">
-                      <div className="p-2 rounded-lg bg-primary-500/20">
-                        <Icon icon={Wallet} size="md" variant="info" />
-                      </div>
-                      <div>
-                        <h3 className="text-text-primary font-bold text-lg">Portfolio Summary</h3>
-                        <p className="text-text-tertiary text-sm">Your investment overview</p>
-                      </div>
-                    </div>
-                    <SectionSeparator variant="line" spacing="sm" />
-                    <div className="grid grid-cols-2 gap-6">
-                      <div className="space-y-1">
-                        <p className="text-text-tertiary text-sm font-medium">Total Value</p>
-                        <p className="text-text-primary font-bold text-2xl">
-                          ${portfolioStats.totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-text-tertiary text-sm font-medium">Total P&L</p>
-                        <div className="flex items-center space-x-2">
-                          <Icon 
-                            icon={portfolioStats.totalProfitPercentage >= 0 ? TrendingUp : TrendingDown}
-                            size="sm"
-                            variant={portfolioStats.totalProfitPercentage >= 0 ? 'success' : 'danger'}
-                          />
-                          <p className={`font-bold text-2xl ${
-                            portfolioStats.totalProfitPercentage >= 0 ? 'text-crypto-green' : 'text-crypto-red'
-                          }`}>
-                            {portfolioStats.totalProfitPercentage >= 0 ? '+' : ''}{(portfolioStats.totalProfitPercentage ?? 0).toFixed(2)}%
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </GlassCard>
-                )}
-                
-                <CollapsibleSection
-                  title="Quick Actions"
-                  icon={<Activity className="w-5 h-5" />}
-                  defaultExpanded={portfolio.length === 0}
-                  className=""
-                  contentClassName="space-y-3"
-                >
-                  <button 
-                    onClick={() => setActiveTab('portfolio')}
-                    className="w-full p-4 text-left text-text-secondary hover:text-text-primary hover:bg-glass-white/30 rounded-xl transition-all duration-200 flex items-center space-x-3 group border border-glass-border/50"
-                  >
-                    <div className="p-2 rounded-lg bg-glass-white/50 group-hover:bg-white/20 transition-colors">
-                      <Wallet className="w-5 h-5 text-primary-400" strokeWidth={2} />
-                    </div>
-                    <div>
-                      <p className="font-medium">Manage Portfolio</p>
-                      <p className="text-text-muted text-sm">Track your crypto investments</p>
-                    </div>
-                  </button>
-                  <button 
-                    onClick={() => setActiveTab('markets')}
-                    className="w-full p-4 text-left text-text-secondary hover:text-text-primary hover:bg-glass-white/30 rounded-xl transition-all duration-200 flex items-center space-x-3 group border border-glass-border/50"
-                  >
-                    <div className="p-2 rounded-lg bg-glass-white/50 group-hover:bg-white/20 transition-colors">
-                      <TrendingUp className="w-5 h-5 text-crypto-green" strokeWidth={2} />
-                    </div>
-                    <div>
-                      <p className="font-medium">Explore Markets</p>
-                      <p className="text-text-muted text-sm">Browse cryptocurrency prices</p>
-                    </div>
-                  </button>
-                  <button 
-                    onClick={() => setActiveTab('charts')}
-                    className="w-full p-4 text-left text-text-secondary hover:text-text-primary hover:bg-glass-white/30 rounded-xl transition-all duration-200 flex items-center space-x-3 group border border-glass-border/50"
-                  >
-                    <div className="p-2 rounded-lg bg-glass-white/50 group-hover:bg-white/20 transition-colors">
-                      <BarChart3 className="w-5 h-5 text-crypto-ethereum" strokeWidth={2} />
-                    </div>
-                    <div>
-                      <p className="font-medium">View Charts</p>
-                      <p className="text-text-muted text-sm">Analyze price movements</p>
-                    </div>
-                  </button>
-                </CollapsibleSection>
-              </div>
-            </div>
+            <DashboardMarketStats data={globalOverviewData} />
+            <AiInsights />
           </div>
         );
         
@@ -224,12 +130,7 @@ function AppContent() {
         return (
           <div className="space-y-section">
             <MarketOverview 
-              data={globalData?.data ? {
-                totalMarketCap: globalData.data.total_market_cap?.usd || 0,
-                marketCapChange24h: globalData.data.market_cap_change_percentage_24h_usd || 0,
-                totalVolume: globalData.data.total_volume?.usd || 0,
-                bitcoinDominance: globalData.data.market_cap_percentage?.btc || 0,
-              } : undefined}
+              data={globalOverviewData}
             />
             
             <SectionSeparator variant="gradient" spacing="lg" withLabel="Live Market Data" />
