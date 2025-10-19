@@ -39,31 +39,25 @@ The initial version of the application had several critical infrastructure issue
 **Task 2.8: Chart Coin Selector (BTC → selectable) (Completed)**
 - **Successed**: Add a simple selector (dropdown or search) to choose the coin id (e.g., BTC, ETH). Chart updates data and indicators for the selected coin, preserving timeframe and indicator toggles.
 
-### Phase 3: AI Briefing MVP (Do-It-Quick)
+### Phase 3: Hybrid AI Insights (MVP)
 
-**Objective:** Ship the fastest possible daily briefing so users see AI value this sprint. Favour simplicity over polish.
+**Objective:** Formalize the existing AI Insights pipeline so deterministic stats stay client-side while the eventual LLM narrative remains a future add-on. For this MVP we will expose a structured data packet and pair it with a lightweight, template-based narrative (no remote LLM yet). Existing caching (`ai-briefing-cache-v1`, 1h TTL, 2-minute retries until first success) remains unchanged.
 
-**Constraints:** No new infra; reuse existing Coingecko data; manual refresh acceptable; brief should load in <2 seconds. AI Insights refreshes at most once per TTL window.
+**Milestones**
 
-#### 3.1 Input Snippet
-- Reuse the top coins API we already hit. Slice out BTC/ETH + 3 biggest movers and today’s global stats.
-- Normalize into a lightweight JSON (prices, 24h change, dominance). Skip news sentiment for now.
-- Document in code so we can swap in richer sources later.
+#### 3.1 Canonical Insight Dataset
+- **M1 – Define Schema:** List every field we currently derive (`Top Movers`, `Gainers/Losers`, global stats, BTC/ETH indicator snapshots, risk callouts). Publish the JSON contract in code and document it in `docs/data-architecture.md`.
+- **M2 – Extract Facts:** Refactor `fetchAiBriefing` so it emits that structured dataset alongside the existing cell copy. Ensure the deterministic facts follow the same TTL/cache rules as the narrative (1h default, retry every 2 min until first success, configurable constant).
 
-#### 3.2 Briefing Generator (On-Demand)
-- Add a single serverless (or Vite dev proxy) endpoint that builds the prompt and calls the chosen LLM.
-- Keep the prompt tiny: intro + movers + quick risk note. Cap tokens to control cost.
-- Return a simple JSON array of `[{title, body}]` cells. If the LLM fails, fall back to a canned “data unavailable” message.
-- Run on-demand when the user opens the widget; no cron job yet.
+#### 3.2 Deterministic Narrative Layer
+- **M1 – Template Engine:** Build a formatter that turns the structured facts into a concise paragraph using string templates (e.g., “Market cap moved X% while BTC dominance is Y%…”).
+- **M2 – Error Handling:** When required inputs are missing, degrade gracefully without breaking the one-refresh-per-TTL guarantee.
+- **M3 – LLM Integration (Pending):** Document a hook point for a future LLM call, but leave it unimplemented in this MVP. Mark the follow-up task on the backlog.
 
-#### 3.3 Frontend Portal
-- Create an `AiInsights` section on the dashboard with 3 cards (`Market Pulse`, `Movers`, `Risk Watch`).
-- Call the endpoint on mount, show skeleton loaders, and surface errors via a single inline banner.
-- Cache the successful briefing in local storage with a configurable TTL (default 1 hour) so the dashboard always shows the last good result for the entire window—even across reloads. Allow the TTL to be switched to 24h by tweaking a single constant.
-- Auto-refresh logic: retry every 2 minutes until the first successful fetch; once we have a valid briefing, do not hit the API again until the TTL expires. This prevents hammering the upstream API while keeping data timely.
-- Remove the manual refresh button; reflect the last successful update time in the UI.
-- When the upstream API fails, keep serving the cached result without invoking the fallback copy; continue retry checks in the background until a successful refresh occurs or TTL expires.
-- Dashboard now opens with `AI Insights`; Market Overview and charts were moved to Markets/Charts tabs to keep the MVP lean.
+#### 3.3 Frontend Presentation
+- **M1 – Facts UI:** Render the structured dataset in dedicated cards/lists so users can inspect the raw numbers.
+- **M2 – Narrative UI:** Show the deterministic paragraph inside the “Market Pulse” tile. When an LLM is wired in later, it can simply replace the template output.
+- **M3 – Telemetry Hook:** Log each emitted dataset to a local telemetry buffer (localStorage hash) so we can validate future LLM responses against the canonical facts. Directory `telemetry/` is git-ignored for any future export scripts.
 
 ### Phase 4: Personalization & Growth (Post-MVP)
 
@@ -100,10 +94,9 @@ The initial version of the application had several critical infrastructure issue
 - [x] **Task 2.8.1: Fix MACD Histogram Colors (sign-based)**
 
 ### Phase 3 (MVP)
-- [x] Input Snippet (reuse top coins API)
-- [x] Briefing Generator Endpoint
-- [x] AI Insights Frontend Cards
-- [x] Refresh & Error Handling
+- [ ] Canonical dataset emitted + documented
+- [ ] Template narrative implemented (LLM integration pending)
+- [ ] UI shows both facts and narrative
 
 ### Phase 4 (Post-MVP)
 - [ ] User Accounts & Personalization
@@ -180,3 +173,32 @@ The initial version of the application had several critical infrastructure issue
 
 ### Chart Scaling Lessons
 - Use separate axes for different units/magnitudes: Price/SMA on left (USD), RSI fixed 0–100 on right, MACD/Signal on a dedicated right axis.
+
+## Future AI Insight Enhancements
+
+The current AI briefing MVP focuses on summarizing existing market data. To provide deeper value, the AI should synthesize novel insights that are not immediately obvious from the raw data. The following ideas propose new "insight cards" or enhancements that could be implemented post-MVP.
+
+### 1. Market Momentum Analysis
+- **Concept:** Analyze the rate of change (velocity and acceleration) of prices, not just the 24h percentage change.
+- **Example Insight:** "Bitcoin is up 3% today, but momentum has slowed in the last 4 hours, suggesting a potential consolidation period."
+- **Data Required:** Hourly price data for major assets.
+
+### 2. Volatility vs. Volume Correlation
+- **Concept:** Have the AI interpret the relationship between price volatility and trading volume to gauge the conviction behind a move.
+- **Example Insight:** "Ethereum saw a sharp 5% price drop, but this was on unusually low trading volume. This could indicate a non-market-moving event or a potential overreaction."
+- **Data Required:** 24h trading volume alongside price data.
+
+### 3. Plain-Language Indicator Summary
+- **Concept:** Use the AI to translate complex technical indicators (like RSI, MACD) into a simple, human-readable summary for a major asset.
+- **Example Insight:** "Bitcoin's daily RSI is at 68, approaching overbought territory. While momentum is currently bullish, traders should be cautious of a potential reversal."
+- **Data Required:** Raw indicator values (RSI, MACD) for the selected asset.
+
+### 4. Asset Correlation Watch
+- **Concept:** Analyze the price correlation between Bitcoin and major altcoins to determine if market moves are broad or asset-specific.
+- **Example Insight:** "Ethereum has been moving in lock-step with Bitcoin today (correlation > 0.9), suggesting the rally is driven by macro factors rather than ETH-specific news."
+- **Data Required:** Price series data for BTC and other major altcoins.
+
+### 5. Bitcoin Dominance Shift Interpretation
+- **Concept:** Interpret the *change* in Bitcoin Dominance to provide context about the flow of capital between Bitcoin and altcoins.
+- **Example Insight:** "Bitcoin Dominance has decreased by 1.5% today, even as prices rose. This may signal the beginning of an 'altcoin season,' where smaller assets are outperforming Bitcoin."
+- **Data Required:** Historical Bitcoin Dominance data (e.g., 7-day).

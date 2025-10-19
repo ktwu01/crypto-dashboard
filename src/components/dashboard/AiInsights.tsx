@@ -108,7 +108,7 @@ const AiInsights: React.FC = () => {
 
       try {
         const cached: CachedBriefing = JSON.parse(cachedRaw);
-        if (!cached?.data?.cells?.length || typeof cached.fetchedAt !== 'number') {
+        if (!cached?.data?.facts || typeof cached.fetchedAt !== 'number') {
           return;
         }
 
@@ -141,15 +141,124 @@ const AiInsights: React.FC = () => {
     return new Date(lastFetchedAt).toLocaleTimeString();
   }, [lastFetchedAt]);
 
-  const renderCells = () => {
-    if (!briefing) return null;
+  const formatUsd = useCallback((value: number, decimals = 0) => {
+    if (!Number.isFinite(value)) return 'N/A';
+    return `$${value.toLocaleString(undefined, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    })}`;
+  }, []);
 
-    return briefing.cells.map((cell) => (
-      <GlassCard key={cell.id} className="p-5 space-y-2 hover:translate-y-0 hover:scale-100">
-        <p className="text-sm uppercase tracking-wide text-text-tertiary">{cell.title}</p>
-        <p className="text-base text-text-secondary leading-relaxed">{cell.body}</p>
-      </GlassCard>
-    ));
+  const formatPercent = useCallback((value: number) => {
+    if (!Number.isFinite(value)) return 'N/A';
+    const sign = value >= 0 ? '+' : '';
+    return `${sign}${value.toFixed(2)}%`;
+  }, []);
+
+  const renderContent = () => {
+    if (!briefing) {
+      return null;
+    }
+
+    const { narrative, facts } = briefing;
+    const { market, gainers, losers, notableMove } = facts;
+
+    return (
+      <div className="space-y-4">
+        <GlassCard className="p-5 space-y-3 hover:translate-y-0 hover:scale-100">
+          <p className="text-sm uppercase tracking-wide text-text-tertiary">Market Pulse</p>
+          <p className="text-base text-text-secondary leading-relaxed">{narrative}</p>
+        </GlassCard>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <GlassCard className="p-5 space-y-3 hover:translate-y-0 hover:scale-100">
+            <p className="text-sm uppercase tracking-wide text-text-tertiary">Market Stats</p>
+            <ul className="space-y-2 text-sm text-text-secondary">
+              <li className="flex items-center justify-between">
+                <span>Total Market Cap</span>
+                <span>{formatUsd(market.totalMarketCapUsd, 0)}</span>
+              </li>
+              <li className="flex items-center justify-between">
+                <span>Market Cap Change (24h)</span>
+                <span>{formatPercent(market.marketCapChangePct)}</span>
+              </li>
+              <li className="flex items-center justify-between">
+                <span>Total Volume (24h)</span>
+                <span>{formatUsd(market.totalVolumeUsd, 0)}</span>
+              </li>
+              <li className="flex items-center justify-between">
+                <span>BTC Dominance</span>
+                <span>{market.btcDominancePct.toFixed(1)}%</span>
+              </li>
+              <li className="flex items-center justify-between">
+                <span>Advancers vs Decliners</span>
+                <span>
+                  {market.advancing} / {market.declining}
+                </span>
+              </li>
+            </ul>
+          </GlassCard>
+
+          <GlassCard className="p-5 space-y-3 hover:translate-y-0 hover:scale-100">
+            <p className="text-sm uppercase tracking-wide text-text-tertiary">Top Movers</p>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-crypto-green">
+                  Gainers
+                </p>
+                <ul className="space-y-1 text-sm text-text-secondary">
+                  {gainers.length ? (
+                    gainers.map((mover) => (
+                      <li key={`gainer-${mover.symbol}`} className="flex items-center justify-between">
+                        <span>
+                          {mover.name} <span className="text-text-muted">({mover.symbol})</span>
+                        </span>
+                        <span className="font-semibold text-crypto-green">
+                          {formatPercent(mover.change24h)}
+                        </span>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-text-muted">No gainers available</li>
+                  )}
+                </ul>
+              </div>
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-crypto-red">
+                  Losers
+                </p>
+                <ul className="space-y-1 text-sm text-text-secondary">
+                  {losers.length ? (
+                    losers.map((mover) => (
+                      <li key={`loser-${mover.symbol}`} className="flex items-center justify-between">
+                        <span>
+                          {mover.name} <span className="text-text-muted">({mover.symbol})</span>
+                        </span>
+                        <span className="font-semibold text-crypto-red">
+                          {formatPercent(mover.change24h)}
+                        </span>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-text-muted">No losers available</li>
+                  )}
+                </ul>
+              </div>
+            </div>
+          </GlassCard>
+        </div>
+
+        {notableMove && (
+          <GlassCard className="p-5 space-y-2 hover:translate-y-0 hover:scale-100">
+            <p className="text-sm uppercase tracking-wide text-text-tertiary">Risk Watch</p>
+            <p className="text-base text-text-secondary leading-relaxed">
+              {notableMove.name} ({notableMove.symbol}) is posting the sharpest swing at{' '}
+              {formatPercent(notableMove.change24h)}. Monitor correlated assets for spillover moves.
+            </p>
+          </GlassCard>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -174,20 +283,22 @@ const AiInsights: React.FC = () => {
         </div>
       )}
 
-      <div className="grid gap-4 md:grid-cols-3">
-        {isLoading && !briefing
-          ? Array.from({ length: 3 }).map((_, index) => (
-              <div
-                key={`ai-briefing-skeleton-${index}`}
-                className="rounded-xl border border-glass-border/60 bg-glass-white/10 p-5 animate-pulse"
-              >
-                <div className="mb-4 h-3 w-24 rounded bg-white/10" />
-                <div className="mb-2 h-3 w-full rounded bg-white/10" />
-                <div className="h-3 w-3/4 rounded bg-white/10" />
-              </div>
-            ))
-          : renderCells()}
-      </div>
+      {isLoading && !briefing ? (
+        <div className="grid gap-4 md:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div
+              key={`ai-briefing-skeleton-${index}`}
+              className="rounded-xl border border-glass-border/60 bg-glass-white/10 p-5 animate-pulse"
+            >
+              <div className="mb-4 h-3 w-24 rounded bg-white/10" />
+              <div className="mb-2 h-3 w-full rounded bg-white/10" />
+              <div className="h-3 w-3/4 rounded bg-white/10" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        renderContent()
+      )}
     </GlassCard>
   );
 };

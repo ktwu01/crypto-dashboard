@@ -34,6 +34,12 @@ Create a production-ready build:
 pnpm build
 ```
 
+or 
+
+```bash
+npm run build
+```
+
 This command:
 1. Installs dependencies
 2. Runs TypeScript compiler checks
