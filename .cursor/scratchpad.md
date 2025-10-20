@@ -174,6 +174,41 @@ The initial version of the application had several critical infrastructure issue
 ### Chart Scaling Lessons
 - Use separate axes for different units/magnitudes: Price/SMA on left (USD), RSI fixed 0–100 on right, MACD/Signal on a dedicated right axis.
 
+### Phase 5: LLM Trade Copilot (Blueprint)
+
+**Goal:** Produce a “trade reasoning” artifact (long/short guidance + confidence) by feeding a normalized multi-timeframe feature pack—similar to the sample log you provided—into an LLM that runs behind an authenticated server endpoint.
+
+**Milestones**
+
+1. **Data Substrate & ATR Coverage**
+   - **Source selection:** Move beyond free, rate-limited APIs; shortlist paid market-data vendors (e.g., CoinAPI, Kaiko, Amberdata) that deliver OHLCV, derivatives (funding, open interest), and indicator-ready candles in a single feed. Paid access is strongly recommended—the sample payload’s derivatives/ATR metrics are rarely available via free tiers at scale.
+   - **Normalization service:** Add a `server/intel/buildSnapshot.ts` module that:
+     - Fetches latest spot + derivatives data for target symbols (BTC, ETH, top N) and computes indicators not provided by the vendor (ATR, custom RSI windows) using `technicalindicators`.
+     - Emits a JSON payload mirroring the sample structure (`meta`, `series`, `indicatorSnapshots`, timestamps oldest→newest).
+     - Persists the latest snapshot in a cache directory (e.g., `telemetry/alpha-snapshots/`) and in an in-memory store for quick reuse.
+   - **Scheduling:** Run this builder on a server-side cron (Supabase Edge Function, Vercel Cron, or a lightweight Node worker) at the same cadence as the upstream feed.
+
+2. **Secure LLM Invocation Layer**
+   - **API design:** Create `/api/alpha-briefing` (server route or serverless function) that:
+     - Validates the caller (API key, JWT session, or internal cron).
+     - Loads the most recent snapshot (regenerating if stale).
+     - Crafts a concise prompt (system + user) constrained to actionable outputs: bias (long/flat/short), rationale bullets, risk markers, and time horizon.
+   - **Provider choice:** Use a paid model (OpenAI o4, Anthropic Claude, or Groq Llama) with deterministic temperature/seed. Keep keys server-side only; never expose them in the browser.
+   - **Guardrails:** Impose rate limits, log prompts/responses for audit, and store the LLM verdict separately (`telemetry/alpha-decisions/alpha-YYYYMMDD-HHMM.json`) for replay testing.
+
+3. **Client Integration & UX**
+   - **Data contract:** In the frontend, introduce a `useAlphaDecision` hook that requests `/api/alpha-briefing`, shows cached results instantly, and surfaces status badges (e.g., “Last run: 05:16 UTC · Bias: Short · Confidence: Medium”).
+   - **MVP delivery:** Render a new “Alpha” panel inside the dashboard summarizing:
+     - Headline call (Long/Short/Neutral) with confidence.
+     - Key drivers (ATR trend, funding, RSI, etc., surfaced from the LLM response).
+     - Risk checklist (e.g., “Volatility elevated: ATR(3)=905 vs ATR(14)=1065”).
+   - **Human-in-the-loop:** Include a disclaimer + feedback toggle so users can flag questionable calls; log this for fine-tuning later.
+
+**Best Practices**
+- Keep heavy data ingestion and LLM work server-side to avoid leaking paid API or model keys.
+- Version-control the snapshot schema (e.g., `docs/data-contracts/alpha-snapshot-v1.json`) so future model updates remain compatible.
+- Monitor vendor usage and implement exponential back-off; if a call fails, serve the previous snapshot with an explicit “stale” banner instead of hammering the provider.
+
 ## Future AI Insight Enhancements
 
 The current AI briefing MVP focuses on summarizing existing market data. To provide deeper value, the AI should synthesize novel insights that are not immediately obvious from the raw data. The following ideas propose new "insight cards" or enhancements that could be implemented post-MVP.
