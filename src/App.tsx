@@ -173,8 +173,9 @@ function AppContent() {
                     <TrendingDown className="w-8 h-8 text-crypto-red" strokeWidth={2} />
                   </div>
                   <div>
-                    <h3 className="text-text-primary font-semibold text-lg mb-2">Failed to load market data</h3>
-                    <p className="text-text-tertiary">Please check your internet connection and try again</p>
+                    <h3 className="text-text-primary font-semibold text-lg mb-2">
+                      this most be due to our api provider limit ERR_FAILED 429 (Too Many Requests) u do not need do anything. just please have a cup of coffee and look back in 10mins
+                    </h3>
                   </div>
                 </div>
               </GlassCard>

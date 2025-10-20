@@ -79,7 +79,9 @@ const GainersLosers: React.FC = () => {
           </>
         ) : (
           <div className="flex justify-center items-center h-48 w-full">
-            <p className="text-text-tertiary">Could not load data.</p>
+            <p className="text-text-tertiary">
+              this most be due to our api provider limit ERR_FAILED 429 (Too Many Requests) u do not need do anything. just please have a cup of coffee and look back in 10mins
+            </p>
           </div>
         )}
       </div>

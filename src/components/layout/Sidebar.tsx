@@ -37,7 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
           </div>
           <div>
             <h1 className="text-xl font-bold text-text-primary">CryptoDash</h1>
-            <p className="text-text-muted text-sm font-medium">Portfolio Tracker</p>
+            <p className="text-text-muted text-sm font-medium">AI-Powered Money Maker</p>
           </div>
         </div>
 

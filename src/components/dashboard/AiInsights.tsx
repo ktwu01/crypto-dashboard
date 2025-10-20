@@ -78,7 +78,9 @@ const AiInsights: React.FC = () => {
       if (!briefingRef.current) {
         setIsLoading(false);
       }
-      setError('AI Insights are temporarily unavailable. Retrying in about 2 minutes.');
+      setError(
+        'this most be due to our api provider limit ERR_FAILED 429 (Too Many Requests) u do not need do anything. just please have a cup of coffee and look back in 10mins'
+      );
       scheduleRetry();
     }
   }, [persistBriefing, scheduleRefresh, scheduleRetry, clearTimer]);

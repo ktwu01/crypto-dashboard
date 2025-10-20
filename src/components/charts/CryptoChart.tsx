@@ -418,8 +418,9 @@ const CryptoChart: React.FC<CryptoChartProps> = ({
               <div className="w-12 h-12 mx-auto rounded-full bg-white/10 flex items-center justify-center">
                 <span className="text-white/70 text-lg">∅</span>
               </div>
-              <p className="text-white/80 text-sm">No chart data available</p>
-              <p className="text-white/50 text-xs">Check your connection or try a different timeframe</p>
+              <p className="text-white/80 text-sm">
+                this most be due to our api provider limit ERR_FAILED 429 (Too Many Requests) u do not need do anything. just please have a cup of coffee and look back in 10mins
+              </p>
             </div>
           </div>
         ) : (

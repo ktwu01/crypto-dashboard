@@ -31,7 +31,7 @@ export interface AiBriefing {
 }
 
 const FALLBACK_NARRATIVE =
-  'Market data is temporarily unavailable. Showing the most recent briefing until live data returns.';
+  'this most be due to our api provider limit ERR_FAILED 429 (Too Many Requests) u do not need do anything. just please have a cup of coffee and look back in 10mins';
 
 const formatNumber = (value: number, decimals = 2) => {
   if (!Number.isFinite(value)) return 'N/A';
