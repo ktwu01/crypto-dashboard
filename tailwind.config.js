@@ -49,7 +49,7 @@ export default {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-crypto': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         'gradient-dark': 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
-        'crypto-pattern': "url('/images/backgrounds/dark_abstract_binary_crypto_gradient_background.jpg')",
+        'crypto-pattern': 'radial-gradient(circle at 20% 20%, rgba(59,130,246,0.08), transparent 55%), radial-gradient(circle at 80% 0%, rgba(248,113,113,0.08), transparent 50%), linear-gradient(135deg, rgba(15,23,42,0.98), rgba(2,6,23,0.98))',
         'section-separator': 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)',
       },
       backdropBlur: {

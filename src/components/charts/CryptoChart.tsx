@@ -11,7 +11,9 @@ import {
   Legend,
   Filler,
   ChartOptions,
-  BarElement
+  BarElement,
+  BarController,
+  LineController
 } from 'chart.js';
 import { motion } from 'framer-motion';
 import GlassCard from '../ui/GlassCard';
@@ -22,9 +24,11 @@ import { Info, ChevronsUpDown } from 'lucide-react';
 ChartJS.register(
   CategoryScale,
   LinearScale,
+  LineController,
   PointElement,
   LineElement,
   BarElement,
+  BarController,
   Title,
   Tooltip,
   Legend,

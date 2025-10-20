@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -25,7 +25,13 @@ import Icon from './components/ui/Icon';
 import { usePortfolio } from './hooks/usePortfolio';
 import cryptoApiService, { CryptoCurrency, MarketChartData } from './services/cryptoApi';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -33,6 +39,16 @@ function AppContent() {
   const [showAddAssetModal, setShowAddAssetModal] = useState(false);
   const [chartTimeframe, setChartTimeframe] = useState('7');
   const [chartCoin, setChartCoin] = useState<CryptoCurrency | undefined>();
+  const dashboardBackground = useMemo(
+    () => ({
+      backgroundImage:
+        'radial-gradient(circle at 20% 20%, rgba(59,130,246,0.08), transparent 55%), radial-gradient(circle at 80% 0%, rgba(248,113,113,0.08), transparent 50%), linear-gradient(135deg, rgba(15,23,42,0.98), rgba(2,6,23,0.98))',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed',
+    }),
+    []
+  );
   
   const {
     portfolio,
@@ -43,11 +59,13 @@ function AppContent() {
   } = usePortfolio();
 
   // Fetch top cryptocurrencies
-  const { data: cryptocurrencies, isLoading: cryptoLoading, error: cryptoError } = useQuery({
+  const { data: cryptocurrencies, isLoading: cryptoLoading } = useQuery({
     queryKey: ['cryptocurrencies'],
     queryFn: () => cryptoApiService.getTopCryptocurrencies(50),
-    refetchInterval: 60000, // Refetch every 60 seconds
-    staleTime: 50000, 
+    refetchInterval: 5 * 60 * 1000, // 5 minutes
+    refetchIntervalInBackground: false,
+    staleTime: 4 * 60 * 1000,
+    retry: 1,
   });
 
   // Set Bitcoin as the default chart coin once crypto data is loaded
@@ -62,8 +80,10 @@ function AppContent() {
   const { data: globalData, isLoading: globalLoading } = useQuery({
     queryKey: ['global-market'],
     queryFn: () => cryptoApiService.getGlobalMarketData(),
-    refetchInterval: 90000, // Refetch every 90 seconds
-    staleTime: 80000,
+    refetchInterval: 5 * 60 * 1000,
+    refetchIntervalInBackground: false,
+    staleTime: 4 * 60 * 1000,
+    retry: 1,
   });
 
   // Fetch chart data for the selected coin
@@ -74,8 +94,10 @@ function AppContent() {
       return cryptoApiService.getMarketChart(chartCoin.id, chartTimeframe);
     },
     enabled: !!chartCoin, // Only run query if a coin is selected
-    refetchInterval: chartTimeframe === '1' ? 60000 : 120000, // 1 min for 1D, 2 mins for others
-    staleTime: chartTimeframe === '1' ? 50000 : 110000,
+    refetchInterval: chartTimeframe === '1' ? 3 * 60 * 1000 : 5 * 60 * 1000,
+    refetchIntervalInBackground: false,
+    staleTime: chartTimeframe === '1' ? 2 * 60 * 1000 : 4 * 60 * 1000,
+    retry: 1,
   });
 
   // Update portfolio prices when crypto data changes
@@ -280,15 +302,7 @@ function AppContent() {
   };
 
   return (
-    <div 
-      className="min-h-screen bg-dark-900" 
-      style={{
-        backgroundImage: "url('/images/backgrounds/dark_abstract_binary_crypto_gradient_background.jpg')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
-      }}
-    >
+    <div className="min-h-screen bg-dark-900" style={dashboardBackground}>
       {/* Background overlay */}
       <div className="fixed inset-0 bg-dark-900/80 backdrop-blur-sm" />
       

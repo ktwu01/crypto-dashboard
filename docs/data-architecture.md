@@ -4,12 +4,13 @@ This document summarizes how the crypto dashboard fetches, stores, and derives d
 
 ## External Data Sources
 
-- **CoinGecko REST API** (`src/services/cryptoApi.ts`): Primary source for market-wide metrics, individual coin quotes, historical chart data, trending lists, and gainers/losers. All requests are made from the client using the configured `VITE_API_BASE_URL`.
+- **CoinGecko REST API** (`src/services/cryptoApi.ts`): Primary source for market-wide metrics, individual coin quotes, historical chart data, trending lists, and gainers/losers. All requests are made from the client using the configured `VITE_API_BASE_URL`. You can optionally set `VITE_COINGECKO_API_KEY` (demo or pro) to inject `x_cg_demo_api_key` on outbound requests; without it, the app stays within CoinGecko’s public rate limits.
 - **LLM Briefing Service (placeholder)**: The `fetchAiBriefing` helper currently synthesizes an AI briefing locally from CoinGecko responses. It represents the contract that a future server-side LLM integration must satisfy (returning structured `{title, body}` cells).
 
 ## Client-Side Storage
 
-- **React Query in-memory cache**: Handles short-lived caching for market, portfolio, and chart queries with aggressive refresh intervals (60–120 seconds) to keep data fresh without manual reloads.
+- **React Query in-memory cache**: Handles market, portfolio, and chart queries on a five-minute cadence. Queries do not refetch on window focus, and retries are limited to a single attempt to respect upstream rate limits.
+- **`cryptoApi` memoized fetches**: `src/services/cryptoApi.ts` maintains TTL-aware caches backed by `localStorage` (where available) and falls back to the last successful payload whenever CoinGecko returns rate-limit errors. This keeps the UI responsive while preventing redundant API calls across different features.
 - **`localStorage` caches**:
   - `usePortfolio` hook keeps the user’s holdings, purchase prices, and related metadata so portfolios persist between sessions.
   - `AI Insights` module saves the last successful briefing (`ai-briefing-cache-v1`) alongside its fetch timestamp. The cached result survives page reloads and prevents repeated API calls inside the TTL window.
