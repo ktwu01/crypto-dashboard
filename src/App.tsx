@@ -174,7 +174,7 @@ function AppContent() {
                   </div>
                   <div>
                     <h3 className="text-text-primary font-semibold text-lg mb-2">
-                      this most be due to our api provider limit ERR_FAILED 429 (Too Many Requests) u do not need do anything. just please have a cup of coffee and look back in 10mins
+                      We hit the API rate limit (429). ☕ Please give it about 10 minutes and try again.
                     </h3>
                   </div>
                 </div>

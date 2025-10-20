@@ -419,7 +419,7 @@ const CryptoChart: React.FC<CryptoChartProps> = ({
                 <span className="text-white/70 text-lg">∅</span>
               </div>
               <p className="text-white/80 text-sm">
-                this most be due to our api provider limit ERR_FAILED 429 (Too Many Requests) u do not need do anything. just please have a cup of coffee and look back in 10mins
+                We hit the API rate limit (429). ☕ Please give it about 10 minutes and try again.
               </p>
             </div>
           </div>

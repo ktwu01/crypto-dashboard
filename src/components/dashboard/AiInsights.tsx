@@ -78,9 +78,7 @@ const AiInsights: React.FC = () => {
       if (!briefingRef.current) {
         setIsLoading(false);
       }
-      setError(
-        'this most be due to our api provider limit ERR_FAILED 429 (Too Many Requests) u do not need do anything. just please have a cup of coffee and look back in 10mins'
-      );
+      setError('We hit the API rate limit (429). ☕ Please give it about 10 minutes and try again.');
       scheduleRetry();
     }
   }, [persistBriefing, scheduleRefresh, scheduleRetry, clearTimer]);

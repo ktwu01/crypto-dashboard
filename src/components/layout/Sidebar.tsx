@@ -21,7 +21,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'markets', label: 'Markets', icon: TrendingUp },
-    { id: 'portfolio', label: 'Portfolio', icon: Wallet },
+    // Portfolio temporarily hidden until the MVP is ready to ship
+    // { id: 'portfolio', label: 'Portfolio', icon: Wallet },
     { id: 'charts', label: 'Charts', icon: BarChart3 },
     { id: 'search', label: 'Search', icon: Search },
     { id: 'settings', label: 'Settings', icon: Settings },
