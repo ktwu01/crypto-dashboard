@@ -1,8 +1,8 @@
-# Crypto Analysis Dashboard
+# AI-Powered Crypto Analysis Dashboard
 
 A comprehensive cryptocurrency analysis and portfolio management dashboard built with React, TypeScript, and Vite. Track real-time crypto prices, market trends, and manage your portfolio with a beautiful, modern UI.
 
-> We are truly thankful for the geek @Zillizezz and benefited greatly from the [Minimax hackathon](https://agent.minimax.io/share/300474460274837). @Zillizezz also allowed us to remix their project (this crypto dashboard) in the hackathon. Although we tried our best to find this username on the whole web, we could not find them on GitHub and so on, and failed to contact them. So we have to just use this new repo instead of forking one.
+> We are truly thankful for the geek @Zillizezz and benefited greatly from the [Minimax hackathon](https://agent.minimax.io/share/300474460274837). @Zillizezz also allowed us to remix their project (crypto-dashboard) in the hackathon. Although we tried our best to find this username on the whole web, we could not find them on GitHub and so on, and failed to contact them. So we have to just use this new repo instead of forking one.
 
 ![Dashboard Overview](docs/crypto-dashboard-dashboard.png)
 *AI Insights sit at the top of the streamlined dashboard, surfacing the latest market pulse alongside high-level performance tiles.*
@@ -119,8 +119,8 @@ To use a different API or endpoint:
 - [x] Portfolio management
 - [x] Interactive price charts
 - [x] Trending coins & market movers
-- [ ] Technical analysis indicators
-- [ ] Customizable watchlists
+- [x] Technical analysis indicators
+- [x] Customizable watchlists
 - [ ] AI-powered market insights
 - [ ] User accounts & cloud sync
 - [ ] Mobile app (React Native)
