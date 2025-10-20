@@ -5,6 +5,7 @@ import sourceIdentifierPlugin from 'vite-plugin-source-info'
 
 const isProd = process.env.BUILD_MODE === 'prod'
 export default defineConfig({
+  base: process.env.NODE_ENV === "production" ? "/crypto-dashboard/" : "/",
   plugins: [
     react(), 
     sourceIdentifierPlugin({
@@ -19,4 +20,3 @@ export default defineConfig({
     },
   },
 })
-
