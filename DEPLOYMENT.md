@@ -167,69 +167,84 @@ Deploy to Netlify for excellent CDN performance.
 
 ### GitHub Pages
 
-Deploy to GitHub Pages for free static hosting.
+GitHub Pages can host this project as a static site. The leanest approach uses GitHub Actions to build and deploy automatically from `main`.
 
-1. **Update `vite.config.ts`** with base path:
-   ```ts
-   export default defineConfig({
-     base: '/crypto-dashboard/', // Your repo name
-     // ... rest of config
-   })
-   ```
+1. **Ensure the base path works for Pages**
+   - If the site is served from `https://<user>.github.io/crypto-dashboard/`, set the Vite base in `vite.config.ts`:
+     ```ts
+     export default defineConfig({
+       base: '/crypto-dashboard/',
+       // ...rest of config
+     })
+     ```
+   - When deploying to the root of `<user>.github.io`, leave `base` as `/` (default).
 
-2. **Build for GitHub Pages**
-   ```bash
-   pnpm build
-   ```
+2. **GitHub Actions workflow**
+   - `.github/workflows/deploy.yml` (already included in this repo):
 
-3. **Deploy using gh-pages**
-   ```bash
-   npm install -g gh-pages
-   gh-pages -d dist
-   ```
+     ```yaml
+     name: Deploy to GitHub Pages
 
-#### Automated Deployment with GitHub Actions
+     on:
+       push:
+         branches: [main]
+       workflow_dispatch:
 
-Create `.github/workflows/deploy.yml`:
+     permissions:
+       contents: read
+       pages: write
+       id-token: write
 
-```yaml
-name: Deploy to GitHub Pages
+     concurrency:
+       group: "pages"
+       cancel-in-progress: true
 
-on:
-  push:
-    branches: [ main ]
+     jobs:
+       build:
+         runs-on: ubuntu-latest
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-        
-    - name: Install pnpm
-      run: npm install -g pnpm
-      
-    - name: Install dependencies
-      run: pnpm install
-      working-directory: ./crypto-dashboard
-      
-    - name: Build
-      run: pnpm build
-      working-directory: ./crypto-dashboard
-      env:
-        VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
-      
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./crypto-dashboard/dist
-```
+         steps:
+           - name: Checkout
+             uses: actions/checkout@v4
+
+           - name: Setup Node
+             uses: actions/setup-node@v4
+             with:
+               node-version: 20
+               cache: pnpm
+
+           - name: Install pnpm
+             run: npm install -g pnpm
+
+           - name: Install dependencies
+             run: pnpm install --frozen-lockfile
+
+           - name: Build
+             run: pnpm build
+
+           - name: Upload artifact
+             uses: actions/upload-pages-artifact@v3
+             with:
+               path: dist
+
+       deploy:
+         needs: build
+         runs-on: ubuntu-latest
+         environment:
+           name: github-pages
+           url: ${{ steps.deployment.outputs.page_url }}
+
+         steps:
+           - name: Deploy to GitHub Pages
+             id: deployment
+             uses: actions/deploy-pages@v4
+     ```
+
+3. **Enable GitHub Pages**
+   - Go to **Settings → Pages** and choose **GitHub Actions** as the source.
+   - After the first successful workflow run, the site will be available at `https://<user>.github.io/<repo>/`.
+
+No secrets are required because the site uses CoinGecko’s public API directly from the browser.
 
 ---
 
@@ -321,6 +336,26 @@ services:
 ### Self-Hosted (VPS)
 
 Deploy to your own server (DigitalOcean, AWS EC2, etc.).
+
+#### Using Google Cloud
+
+https://shell.cloud.google.com/?project=involuted-span-466413-s6&pli=1&show=ide%2Cterminal
+
+In the Google Cloud terminal, git clone this repo, and run:
+
+```bash
+npm run preview -- --host
+```
+
+Then this repo is running inside Cloud Shell.
+
+网页预览按钮可以在 Cloud Shell 任务栏的右上角找到。
+
+Then click "网页预览按钮". change port number if necessary.
+
+Then will be directed to a link, which will look something like this: https://4173-cs-12345-...-devshell.app
+
+This is the quickist way to see your site.
 
 #### Using Nginx
 
@@ -501,4 +536,3 @@ For deployment issues:
 ---
 
 **Last Updated**: October 17, 2025
-
