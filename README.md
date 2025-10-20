@@ -4,6 +4,15 @@ A comprehensive cryptocurrency analysis and portfolio management dashboard built
 
 > This project is a fork of the Minimax hackathon [project](https://agent.minimax.io/share/300474460274837) provided by @Zillizezz
 
+![Dashboard Overview](docs/crypto-dashboard-dashboard.png)
+*AI Insights sit at the top of the streamlined dashboard, surfacing the latest market pulse alongside high-level performance tiles.*
+
+![Market Explorer](docs/crypto-dashboard-market.png)
+*Market view highlights gainers, losers, and trending coins while letting you drill into granular quote data with a responsive table layout.*
+
+![Advanced Charts](docs/crypto-dashboard-charts.png)
+*Interactive chart workspace combines multi-interval price action with technical overlays for deeper analysis.*
+
 ## Features
 
 ### Market Overview
@@ -55,6 +64,8 @@ A comprehensive cryptocurrency analysis and portfolio management dashboard built
    The default configuration uses CoinGecko's free API:
    ```env
    VITE_API_BASE_URL=https://api.coingecko.com/api/v3
+   # Optional: supply a demo/pro key to raise rate limits and attach x_cg_demo_api_key automatically
+   # VITE_COINGECKO_API_KEY=your-demo-or-pro-key
    ```
 
 4. **Start the development server**
