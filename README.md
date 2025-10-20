@@ -2,7 +2,7 @@
 
 A comprehensive cryptocurrency analysis and portfolio management dashboard built with React, TypeScript, and Vite. Track real-time crypto prices, market trends, and manage your portfolio with a beautiful, modern UI.
 
-> This project is a fork of the Minimax hackathon [project](https://agent.minimax.io/share/300474460274837) provided by @Zillizezz
+> We are truly thankful for the geek @Zillizezz and benefited greatly from the [Minimax hackathon](https://agent.minimax.io/share/300474460274837). @Zillizezz also allowed us to remix their project (this crypto dashboard) in the hackathon. Although we tried our best to find this username on the whole web, we could not find them on GitHub and so on, and failed to contact them. So we have to just use this new repo instead of forking one.
 
 ![Dashboard Overview](docs/crypto-dashboard-dashboard.png)
 *AI Insights sit at the top of the streamlined dashboard, surfacing the latest market pulse alongside high-level performance tiles.*
@@ -142,7 +142,7 @@ This project is open source and available under the [MIT License](LICENSE).
 ## Acknowledgments
 
 - [CoinGecko API](https://www.coingecko.com/en/api) for cryptocurrency data
-- [@Zillizezz](https://github.com/Zillizezz) for the original Minimax hackathon project
+- [@Zillizezz](https://agent.minimax.io/share/300474460274837) for the original Minimax hackathon project
 - [Radix UI](https://www.radix-ui.com/) for accessible component primitives
 - [Tailwind CSS](https://tailwindcss.com/) for utility-first styling
 
