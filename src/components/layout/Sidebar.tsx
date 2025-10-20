@@ -6,7 +6,10 @@ import {
   BarChart3, 
   Settings, 
   Home,
-  Search
+  Search,
+  Github,
+  Star,
+  GitFork
 } from 'lucide-react';
 import GlassCard from '../ui/GlassCard';
 import Icon from '../ui/Icon';
@@ -87,28 +90,41 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
           })}
         </nav>
 
-        {/* Footer
-        <div className="mt-auto pt-6">
+        <div className="mt-8">
           <SectionSeparator variant="line" spacing="sm" />
-          <div className="p-4 rounded-xl bg-gradient-to-r from-crypto-bitcoin/10 to-crypto-ethereum/10 border border-glass-border/50">
-            <div className="flex items-center space-x-3">
-              <div className="relative">
-                <img 
-                  src="/images/crypto/clean_bitcoin_cryptocurrency_icon_logo.jpg" 
-                  alt="Bitcoin" 
-                  className="w-10 h-10 rounded-full ring-2 ring-crypto-bitcoin/30"
-                />
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-crypto-green rounded-full border-2 border-dark-900 flex items-center justify-center">
-                  <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-                </div>
-              </div>
-              {/* <div>
-                <p className="text-text-primary font-semibold text-sm">BTC</p>
-                <p className="text-crypto-bitcoin text-xs font-medium">Live Price</p>
-              </div>
+          <div className="mt-4 space-y-3">
+            <a
+              href="https://github.com/ktwu01/crypto-dashboard/"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-center px-4 py-3 rounded-xl border border-glass-border/60 bg-glass-white/20 text-sm text-text-secondary hover:bg-primary-500/20 hover:text-primary-200 transition-all duration-200 space-x-2"
+            >
+              <Github className="w-4 h-4" />
+              <span>GitHub Repo</span>
+            </a>
+            <div className="flex items-center justify-center px-4 py-3 rounded-xl border border-glass-border/60 bg-glass-white/10 text-sm text-text-secondary space-x-3">
+              <a
+                href="https://github.com/ktwu01/crypto-dashboard/stargazers"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center space-x-2 hover:text-primary-200 transition-colors duration-200"
+              >
+                <Star className="w-4 h-4" />
+                <span>Star</span>
+              </a>
+              <span className="text-text-muted">|</span>
+              <a
+                href="https://github.com/ktwu01/crypto-dashboard/fork"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center space-x-2 hover:text-primary-200 transition-colors duration-200"
+              >
+                <GitFork className="w-4 h-4" />
+                <span>Fork</span>
+              </a>
             </div>
           </div>
-        </div> */}
+        </div>
       </GlassCard>
     </div>
   );
