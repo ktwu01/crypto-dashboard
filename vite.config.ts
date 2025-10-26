@@ -1,25 +1,16 @@
-import path from "path"
-import react from "@vitejs/plugin-react"
-import { defineConfig } from "vite"
-import sourceIdentifierPlugin from "vite-plugin-source-info"
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
-export default defineConfig(({ mode }) => {
-  const isProdBuild = mode === "production" || process.env.BUILD_MODE === "prod"
-
-  return {
-    base: mode === "production" ? "/crypto-dashboard/" : "/",
-    plugins: [
-      react(),
-      sourceIdentifierPlugin({
-        enabled: !isProdBuild,
-        attributePrefix: "data-matrix",
-        includeProps: true,
-      }),
-    ],
-    resolve: {
-      alias: {
-        "@": path.resolve(__dirname, "./src"),
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8787',
+        changeOrigin: true,
+        rewrite: (p) => p, // 保持 /api 前缀不变
       },
     },
-  }
+  },
 })
