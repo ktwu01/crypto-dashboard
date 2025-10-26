@@ -8,9 +8,13 @@
     "build": "yes | pnpm install && rm -rf node_modules/.vite-temp && tsc -b && vite build",
     "build:prod": "yes | pnpm install && rm -rf node_modules/.vite-temp && tsc -b && BUILD_MODE=prod vite build",
     "lint": "yes | pnpm install && eslint .",
-    "preview": "yes | pnpm install && vite preview"
+    "preview": "yes | pnpm install && vite preview"，
+    "proxy:dev": "wrangler dev worker/index.ts",
+    "proxy:deploy": "wrangler deploy worker/index.ts"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.59.0",
+    "lightweight-charts": "^4.1.0",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.4",
@@ -85,5 +89,6 @@
     "typescript-eslint": "^8.15.0",
     "vite": "^6.0.1",
     "vite-plugin-source-info": "^1.0.0"
+    "wrangler": "^3.80.0"
   }
 }
