@@ -1,5 +1,11 @@
 # AI-Powered Crypto Analysis Dashboard
 
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Fktwu01.github.io%2Fcrypto-dashboard%2F)](https://ktwu01.github.io/crypto-dashboard/) [![GitHub stars](https://img.shields.io/github/stars/ktwu01/crypto-dashboard)](https://github.com/ktwu01/crypto-dashboard) [![GitHub forks](https://img.shields.io/github/forks/ktwu01/crypto-dashboard)](https://github.com/ktwu01/crypto-dashboard/fork) ![License](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey.svg)
+
+[![Build Status](https://img.shields.io/travis/com/ktwu01/crypto-dashboard.svg)](https://travis-ci.com/ktwu01/crypto-dashboard) [![Coverage Status](https://coveralls.io/repos/github/ktwu01/crypto-dashboard/badge.svg?branch=main)](https://coveralls.io/github/ktwu01/crypto-dashboard?branch=main) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+
+[![Twitter Follow](https://img.shields.io/twitter/follow/ktwu01?style=social)](https://twitter.com/ktwu01)
+
 A comprehensive cryptocurrency analysis and portfolio management dashboard built with React, TypeScript, and Vite. Track real-time crypto prices, market trends, and manage your portfolio with a beautiful, modern UI.
 
 > We are truly thankful for the geek @Zillizezz and benefited greatly from the [Minimax hackathon](https://agent.minimax.io/share/300474460274837). @Zillizezz also allowed us to remix their project (crypto-dashboard) in the hackathon. Although we tried our best to find this username on the whole web, we could not find them on GitHub and so on, and failed to contact them. So we have to just use this new repo instead of forking one.
